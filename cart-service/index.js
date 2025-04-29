@@ -1,7 +1,11 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
 const os = require('os');
+const { connectRabbitMQ } = require('./rabbitmq');
 const app = express();
+const cartRoutes = require('./routes/cart');
+
+connectRabbitMQ();
 
 const serviceName = 'cart-service';
 const serviceId = `${serviceName}-${os.hostname()}`;
@@ -10,9 +14,7 @@ app.use(express.json());
 
 app.get('/health', (req, res) => res.send('OK'));
 
-app.get('/cart',(req,res)=>{
-  res.json({message:'accessing cart service'})
-})
+app.use('/cart',cartRoutes)
 
 
 const PORT = 3003;

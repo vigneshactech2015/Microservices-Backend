@@ -1,7 +1,10 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
 const os = require('os');
+const { connectRabbitMQ } = require('./rabbitmq');
 const app = express();
+
+connectRabbitMQ()
 
 const serviceName = 'auth-service'; // Replace with actual service name
 const serviceId = `${serviceName}-${os.hostname()}`;

@@ -6,6 +6,7 @@ docker-compose up (Restart Service for Code changes)
 
 CONSUL : http://localhost:8500/
 API Gateway : http://localhost:3000/api/serviceName/path
+RabbitMQ (Decoupled Async Messaging queqe) : http://localhost:15672
 
 
 Service Discovery : CONSUL
