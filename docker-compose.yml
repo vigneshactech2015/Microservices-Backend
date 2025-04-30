@@ -70,6 +70,7 @@ services:
     networks:
       - mynetwork
     depends_on:
+      - rabbitmq
       - consul
     environment:
       - CONSUL_HTTP_ADDR=http://consul:8500
@@ -87,12 +88,30 @@ services:
     environment:
       - CONSUL_HTTP_ADDR=http://consul:8500
 
+  inventory-service:
+    build:
+      context: ./inventory-service
+    container_name: inventory-service
+    ports:
+      - "3006:3006"
+    networks:
+      - mynetwork
+    depends_on:
+      - consul
+    environment:
+      - CONSUL_HTTP_ADDR=http://consul:8500
+
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - mynetwork
+    depends_on:
+      - consul
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest

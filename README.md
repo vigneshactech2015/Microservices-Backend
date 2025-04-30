@@ -1,3 +1,4 @@
+docker container prune  --> Remove all container
 docker-compose down -v 
 docker-compose up --build (Docker file Changes)
 docker-compose up (Restart Service for Code changes)
@@ -22,4 +23,7 @@ Product Service : PORT 3002
 Cart Service : PORT 3003
 Order Service : PORT 3004
 Notification Service : PORT 3005
+Inventory Service : PORT 3006
+
+Order Service has RabbitMQ Connection
 
