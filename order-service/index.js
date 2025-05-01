@@ -1,12 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const os = require('os');
 const consul = require('consul')({ host: 'consul' });
+
 const { connectRabbitMQ, sendToQueue } = require('./rabbitmq');
 
 const app = express();
 app.use(bodyParser.json());
 
+const serviceName = 'order-service';
+const serviceId = `${serviceName}-${os.hostname()}`;
+const PORT = 3004;
+
+// Health check for Consul
+app.get('/health', (req, res) => res.send('OK'));
+
+// Consul service resolver
 const resolveService = (name) =>
   new Promise((resolve, reject) => {
     consul.catalog.service.nodes(name, (err, result) => {
@@ -19,6 +29,7 @@ const resolveService = (name) =>
     });
   });
 
+// Order placement logic
 app.post('/order/place', async (req, res) => {
   const { userId, items } = req.body;
 
@@ -55,15 +66,36 @@ app.post('/order/place', async (req, res) => {
   }
 });
 
-const PORT = 3004;
+// Boot function
 (async () => {
   try {
     await connectRabbitMQ();
+
     app.listen(PORT, () => {
-      console.log(`Order Service running on port ${PORT}`);
+      console.log(`✅ Order Service running on port ${PORT}`);
+
+      // Register service with Consul
+      consul.agent.service.register({
+        id: serviceId,
+        name: serviceName,
+        address: serviceName,
+        port: PORT,
+        check: {
+          http: `http://${serviceName}:${PORT}/health`,
+          interval: '10s',
+          timeout: '5s'
+        }
+      }, (err) => {
+        if (err) {
+          console.error('❌ Error registering with Consul:', err);
+        } else {
+          console.log(`📌 Registered ${serviceName} with Consul`);
+        }
+      });
     });
+
   } catch (err) {
-    console.error(err.message);
-    process.exit(1); // Prevent running without RabbitMQ
+    console.error('🚨 Startup error:', err.message);
+    process.exit(1);
   }
 })();

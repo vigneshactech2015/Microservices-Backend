@@ -1,36 +1,65 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
 const os = require('os');
-const app = express();
+const { connectRabbitMQ } = require('./rabbitmq');
 
+const app = express();
 const serviceName = 'notification-service';
 const serviceId = `${serviceName}-${os.hostname()}`;
+const PORT = 3005;
 
 app.use(express.json());
 
+// Health check endpoint for Consul
 app.get('/health', (req, res) => res.send('OK'));
 
-app.get('/notification',(req,res)=>{
-  res.send({message:'Notification Service'})
-})
+// Handle incoming RabbitMQ messages
+const handleNotification = (message) => {
+  console.log('📩 Notification Received:', message);
 
+  switch (message.type) {
+    case 'ORDER_PLACED':
+      console.log(`🔔 Order Placed: ${message.data.orderId} for user ${message.data.userId}`);
+      // Future: Send email/SMS/etc.
+      break;
+    default:
+      console.warn('⚠️ Unknown message type:', message.type);
+  }
+};
 
-const PORT = 3005;
-app.listen(PORT, () => {
-  console.log(`${serviceName} running on port ${PORT}`);
+// Start the service
+const start = async () => {
+  try {
+    // Start RabbitMQ consumer
+    await connectRabbitMQ(handleNotification);
 
-  // Register service with Consul
-  consul.agent.service.register({
-    id: serviceId,
-    name: serviceName,
-    address: serviceName,
-    port: PORT,
-    check: {
-      http: `http://${serviceName}:${PORT}/health`,
-      interval: '10s'
-    }
-  }, err => {
-    if (err) console.error('Error registering service:', err);
-  });
-});
+    // Start Express server
+    app.listen(PORT, () => {
+      console.log(`${serviceName} running on port ${PORT}`);
 
+      // Register with Consul
+      consul.agent.service.register({
+        id: serviceId,
+        name: serviceName,
+        address: serviceName, // Container hostname
+        port: PORT,
+        check: {
+          http: `http://${serviceName}:${PORT}/health`,
+          interval: '10s',
+          timeout: '5s'
+        }
+      }, (err) => {
+        if (err) {
+          console.error('❌ Error registering service with Consul:', err);
+        } else {
+          console.log(`✅ ${serviceName} registered with Consul`);
+        }
+      });
+    });
+
+  } catch (err) {
+    console.error('🚨 Error starting Notification Service:', err.message);
+  }
+};
+
+start();

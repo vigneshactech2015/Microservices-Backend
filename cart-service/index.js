@@ -4,8 +4,6 @@ const os = require('os');
 const app = express();
 const cartRoutes = require('./routes/cart');
 
-connectRabbitMQ();
-
 const serviceName = 'cart-service';
 const serviceId = `${serviceName}-${os.hostname()}`;
 
