@@ -1,9 +1,8 @@
 docker container prune  --> Remove all container
 docker-compose down -v 
-docker-compose up --build (Docker file Changes)
-docker-compose up (Restart Service for Code changes)
+docker-compose up --build
 
-docker-compose up --scale product-service=3 (Scale instance of product service)
+
 
 Scaling + Running 
 
@@ -20,6 +19,7 @@ RabbitMQ (Decoupled Async Messaging queqe) : http://localhost:15672
 Service Discovery : CONSUL
 Backend and API Gateway: Node JS + Express JS
 Container Orchestration : Docker Compose
+Load Balancer : CONSUL
 
 
 MICROSERVICES:
