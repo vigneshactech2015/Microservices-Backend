@@ -19,10 +19,11 @@ app.get('/health', (req, res) => res.send('OK'));
 
 app.get('/products', (req, res) => {
   const { search = '', category = '' } = req.query;
-  const result = PRODUCTS.filter(p => {
+  const result = PRODUCTS.filter(p =>
     (p.name.toLowerCase().includes(search.toLowerCase()) || search === '') &&
-      (p.category.toLowerCase() === category.toLowerCase() || category === '')
-  })
+    (p.category.toLowerCase() === category.toLowerCase() || category === '')
+  );
+  
   res.status(200).json(result);
 })
 

@@ -34,7 +34,7 @@ const {username,password} = req.body;
 
 
 const PORT = 3001;
-app.listen(PORT, () => {
+app.listen(PORT,'0.0.0.0', () => {
   console.log(`${serviceName} running on port ${PORT}`);
 
   // Register service with Consul
