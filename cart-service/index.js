@@ -1,11 +1,10 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
-const os = require('os');
 const app = express();
 const cartRoutes = require('./routes/cart');
 
 const serviceName = 'cart-service';
-const serviceId = `${serviceName}-${os.hostname()}`;
+const serviceId = 'cart-service';
 
 app.use(express.json());
 
