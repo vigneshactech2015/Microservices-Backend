@@ -8,9 +8,9 @@ app.use(bodyParser.json());
 
 // Mock inventory data
 let stock = {
-  'product-1': 10,
-  'product-2': 5,
-  'product-3': 0
+  'p1': 10,
+  'p2': 5,
+  'p3': 0
 };
 
 // Check stock endpoint

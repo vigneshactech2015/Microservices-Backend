@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-const os = require('os');
 const consul = require('consul')({ host: 'consul' });
 
 const { connectRabbitMQ, sendToQueue } = require('./rabbitmq');
@@ -10,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 const serviceName = 'order-service';
-const serviceId = `${serviceName}-${os.hostname()}`;
+const serviceId = 'order-service';
 const PORT = 3004;
 
 // Health check for Consul
@@ -58,7 +57,7 @@ app.post('/order/place', async (req, res) => {
       data: order,
     });
 
-    res.json({ success: true, order });
+    res.status(200).json({ success: true, order });
 
   } catch (err) {
     console.error('Order placement error:', err.message);
