@@ -46,8 +46,19 @@ app.all('/api/:service/*', async (req, res) => {
       responseType: 'json'
     };
 
-    const response = await axios(options);
-    res.status(response.status).json(response.data);
+    try {
+      const response = await axios(options);
+      res.status(response.status).set(response.headers).send(response.data);
+    } catch (err) {
+      if (err.response) {
+        // Forward the error from the microservice
+        res.status(err.response.status).send(err.response.data);
+      } else {
+        // Internal server or network error
+        console.error(`Error forwarding request: ${err.message}`);
+        res.status(500).send(`Internal Server Error: ${err.message}`);
+      }
+    }
   } catch (err) {
     console.error(`Error forwarding request: ${err.message}`);
     res.status(500).send(`Internal Server Error: ${err.message}`);
