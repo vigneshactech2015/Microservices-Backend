@@ -1,7 +1,6 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
 const os = require('os');
-const { connectRabbitMQ } = require('./rabbitmq');
 const app = express();
 
 connectRabbitMQ()
