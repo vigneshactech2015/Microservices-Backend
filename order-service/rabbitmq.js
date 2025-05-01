@@ -2,7 +2,7 @@ const amqp = require('amqplib');
 
 let channel = null;
 
-const connectRabbitMQ = async (retries = 5, delay = 5000) => {
+const connectRabbitMQ = async (retries = 20, delay = 5000) => {
   for (let i = 0; i < retries; i++) {
     try {
       const connection = await amqp.connect('amqp://rabbitmq:5672');

@@ -28,6 +28,14 @@ const resolveService = (name) =>
     });
   });
 
+// Mocking the payment
+const mockPaymentProcess = async () => {
+  const isSuccess = Math.random() > 0.5;
+  await new Promise((res) => setTimeout(res, 1000));
+  if (isSuccess) return { success: true };
+  else throw new Error('Payment failed due to insufficient funds');
+};
+
 // Order placement logic
 app.post('/order/place', async (req, res) => {
   const { userId, items } = req.body;
@@ -41,6 +49,26 @@ app.post('/order/place', async (req, res) => {
         success: false,
         message: 'Item out of stock',
         item: inventoryCheck.data.item,
+      });
+    }
+
+    // Simulate payment process
+    try {
+      await mockPaymentProcess();
+    } catch (paymentError) {
+      await sendToQueue('order_notifications', {
+        type: 'ORDER_PAYMENT_FAILED',
+        data: {
+          userId,
+          items,
+          reason: paymentError.message,
+          timestamp: new Date().toISOString()
+        },
+      });
+
+      return res.status(402).json({
+        success: false,
+        message: paymentError.message,
       });
     }
 
