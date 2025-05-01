@@ -34,3 +34,15 @@ Inventory Service : PORT 3006
 
 Order Service has RabbitMQ Connection
 
+
+DOCKER IMAGES : 
+
+1) API GATEWAY : vigneshactech2015/api-gateway
+2) AUTH SERVICE : vigneshactech2015/auth-service
+3) PRODUCT SERVICE : vigneshactech2015/product-service
+4) CART SERVICE :  vigneshactech2015/cart-service
+5) ORDER SERVICE : vigneshactech2015/order-service
+6) NOTIFICATION SERVICE : vigneshactech2015/notification-service
+7) INVENTORY SERVICE : vigneshactech2015/inventory-service
+
+

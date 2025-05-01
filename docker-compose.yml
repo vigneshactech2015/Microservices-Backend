@@ -10,8 +10,7 @@ services:
       - CONSUL_BIND_INTERFACE=eth0
 
   api-gateway:
-    build:
-      context: ./api-gateway
+    image: vigneshactech2015/api-gateway
     container_name: api-gateway
     ports:
       - "3000:3000"
@@ -21,8 +20,7 @@ services:
       - consul
 
   auth-service:
-    build:
-      context: ./auth-service
+    image: vigneshactech2015/auth-service
     container_name: auth-service
     ports:
       - "3001:3001"
@@ -34,8 +32,7 @@ services:
       - CONSUL_HTTP_ADDR=http://consul:8500
 
   cart-service:
-    build:
-      context: ./cart-service
+    image: vigneshactech2015/cart-service
     container_name: cart-service
     ports:
       - "3003:3003"
@@ -47,8 +44,7 @@ services:
       - CONSUL_HTTP_ADDR=http://consul:8500
 
   notification-service:
-    build:
-      context: ./notification-service
+    image: vigneshactech2015/notification-service
     container_name: notification-service
     ports:
       - "3005:3005"
@@ -60,8 +56,7 @@ services:
       - CONSUL_HTTP_ADDR=http://consul:8500
 
   order-service:
-    build:
-      context: ./order-service
+    image: vigneshactech2015/order-service
     container_name: order-service
     ports:
       - "3004:3004"
@@ -74,8 +69,7 @@ services:
       - CONSUL_HTTP_ADDR=http://consul:8500
 
   product-service:
-    build:
-      context: ./product-service
+    image: vigneshactech2015/product-service
     # No container name , No ports because of scaling rules
     # Docker assigns a random port on the host, but the container still listens on 3002 internally.
     networks:
@@ -86,8 +80,7 @@ services:
       - CONSUL_HTTP_ADDR=http://consul:8500
 
   inventory-service:
-    build:
-      context: ./inventory-service
+    image: vigneshactech2015/inventory-service
     container_name: inventory-service
     ports:
       - "3006:3006"
