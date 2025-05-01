@@ -47,7 +47,6 @@ app.post('/order/place', async (req, res) => {
     const order = {
       orderId: `order-${Date.now()}`,
       userId,
-      items,
       status: 'placed',
       timestamp: new Date().toISOString(),
     };
