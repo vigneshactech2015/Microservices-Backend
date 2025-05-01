@@ -78,9 +78,8 @@ services:
   product-service:
     build:
       context: ./product-service
-    container_name: product-service
-    ports:
-      - "3002:3002"
+    # No container name , No ports because of scaling rules
+    # Docker assigns a random port on the host, but the container still listens on 3002 internally.
     networks:
       - mynetwork
     depends_on:

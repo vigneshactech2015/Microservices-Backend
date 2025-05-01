@@ -11,13 +11,28 @@ app.use((req, res, next) => {
   }
 });
 
+const serviceCache = {};
+
+function getNextInstance(serviceName, instances) {
+  if (!serviceCache[serviceName]) {
+    serviceCache[serviceName] = { index: 0 };
+  }
+
+  const cache = serviceCache[serviceName];
+  const instance = instances[cache.index % instances.length];
+  cache.index += 1;
+  return instance;
+}
+
 function resolveService(serviceName) {
   return new Promise((resolve, reject) => {
     consul.catalog.service.nodes(serviceName, (err, result) => {
       if (err || result.length === 0) {
         reject(new Error(`${serviceName} - Service not found`));
       } else {
-        const service = result[0];
+        // adding load balancer to product service
+        // round - robin load balancer
+        const service = serviceName === 'product-service' ? getNextInstance(serviceName,result) : result[0];
         const address = service.ServiceAddress || service.Address;
         resolve(`http://${address}:${service.ServicePort}`);
       }

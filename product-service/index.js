@@ -2,9 +2,11 @@ const express = require('express');
 const consul = require('consul')({ host: 'consul' });
 const app = express();
 const ip = require('ip');
+const { v4: uuidv4 } = require('uuid');
 
 const serviceName = 'product-service';
-const serviceId = 'product-service';
+const serviceId = `product-service-${uuidv4()}`;
+const localIp = ip.address();
 
 app.use(express.json());
 
@@ -24,7 +26,10 @@ app.get('/products', (req, res) => {
     (p.category.toLowerCase() === category.toLowerCase() || category === '')
   );
   
-  res.status(200).json(result);
+  // returning serviceId to check the load balancer functionality
+  res.status(200).json({
+    servedBy: serviceId,
+    data:result});
 })
 
 app.get('/products/:id', (req, res) => {
@@ -44,7 +49,7 @@ app.listen(PORT, '0.0.0.0', () => {
     address: ip.address(),
     port: PORT,
     check: {
-      http: `http://product-service:${PORT}/health`,
+      http: `http://${localIp}:${PORT}/health`,
       interval: '10s'
     }
   }, err => {

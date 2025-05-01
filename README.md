@@ -3,6 +3,13 @@ docker-compose down -v
 docker-compose up --build (Docker file Changes)
 docker-compose up (Restart Service for Code changes)
 
+docker-compose up --scale product-service=3 (Scale instance of product service)
+
+Scaling + Running 
+
+docker-compose up --scale product-service=3 --build
+
+Adding Load balancer to product service since it has more traffic than rest of the service
 
 
 CONSUL : http://localhost:8500/
