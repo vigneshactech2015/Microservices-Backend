@@ -6,11 +6,12 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "consul": "^0.40.0",
-    "express": "^4.18.2",
+    "amqplib": "^0.10.3",
     "axios": "^1.6.8",
     "body-parser": "^1.20.2",
-    "amqplib": "^0.10.3",
+    "consul": "^0.40.0",
+    "express": "^4.18.2",
+    "opossum": "^5.0.1",
     "uuid": "^9.0.1"
   }
 }

@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const consul = require('consul')({ host: 'consul' });
+const CircuitBreaker = require('opossum');
 
 const { connectRabbitMQ, sendToQueue } = require('./rabbitmq');
 
@@ -12,7 +13,7 @@ const serviceName = 'order-service';
 const serviceId = 'order-service';
 const PORT = 3004;
 
-// Health check for Consul
+// Health check
 app.get('/health', (req, res) => res.send('OK'));
 
 // Consul service resolver
@@ -36,25 +37,37 @@ const mockPaymentProcess = async () => {
   else throw new Error('Payment failed due to insufficient funds');
 };
 
-// Order placement logic
+const breakerOptions = {
+  timeout: 3000,
+  errorThresholdPercentage: 50,
+  resetTimeout: 5000
+};
+
+const inventoryBreaker = new CircuitBreaker(async (items) => {
+  const inventoryUrl = await resolveService('inventory-service');
+  const response = await axios.post(`${inventoryUrl}/inventory/check`, { items });
+  return response.data;
+}, breakerOptions);
+
+const paymentBreaker = new CircuitBreaker(mockPaymentProcess, breakerOptions);
+
 app.post('/order/place', async (req, res) => {
   const { userId, items } = req.body;
 
   try {
-    const inventoryUrl = await resolveService('inventory-service');
-    const inventoryCheck = await axios.post(`${inventoryUrl}/inventory/check`, { items });
+    const inventoryCheck = await inventoryBreaker.fire(items);
 
-    if (!inventoryCheck.data.success) {
+    if (!inventoryCheck.success) {
       return res.status(400).json({
         success: false,
         message: 'Item out of stock',
-        item: inventoryCheck.data.item,
+        item: inventoryCheck.item,
       });
     }
 
-    // Simulate payment process
+    // Simulate payment
     try {
-      await mockPaymentProcess();
+      await paymentBreaker.fire();
     } catch (paymentError) {
       await sendToQueue('order_notifications', {
         type: 'ORDER_PAYMENT_FAILED',
@@ -87,12 +100,11 @@ app.post('/order/place', async (req, res) => {
     res.status(200).json({ success: true, order });
 
   } catch (err) {
-    console.error('Order placement error:', err.message);
+    console.error('❌ Order placement error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// Boot function
 (async () => {
   try {
     await connectRabbitMQ();
@@ -100,7 +112,6 @@ app.post('/order/place', async (req, res) => {
     app.listen(PORT, () => {
       console.log(`✅ Order Service running on port ${PORT}`);
 
-      // Register service with Consul
       consul.agent.service.register({
         id: serviceId,
         name: serviceName,
