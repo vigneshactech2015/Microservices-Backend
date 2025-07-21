@@ -1,10 +1,19 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
+const cors = require('cors');
 const app = express();
 const cartRoutes = require('./routes/cart');
 
 const serviceName = 'cart-service';
 const serviceId = 'cart-service';
+
+// Configure CORS
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 app.use(express.json());
 

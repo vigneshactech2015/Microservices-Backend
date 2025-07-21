@@ -1,9 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const consul = require('consul')({ host: 'consul' });
+const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
+
+// Configure CORS
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
 app.use(bodyParser.json());
 
 // Mock inventory data

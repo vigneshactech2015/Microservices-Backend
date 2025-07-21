@@ -1,5 +1,6 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
+const cors = require('cors');
 const os = require('os');
 const { connectRabbitMQ } = require('./rabbitmq');
 
@@ -7,6 +8,14 @@ const app = express();
 const serviceName = 'notification-service';
 const serviceId = `${serviceName}-${os.hostname()}`;
 const PORT = 3005;
+
+// Configure CORS
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 app.use(express.json());
 

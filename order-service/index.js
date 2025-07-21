@@ -2,11 +2,21 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const consul = require('consul')({ host: 'consul' });
+const cors = require('cors');
 const CircuitBreaker = require('opossum');
 
 const { connectRabbitMQ, sendToQueue } = require('./rabbitmq');
 
 const app = express();
+
+// Configure CORS
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
 app.use(bodyParser.json());
 
 const serviceName = 'order-service';

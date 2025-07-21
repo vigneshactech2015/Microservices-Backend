@@ -1,7 +1,16 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
 const axios = require('axios');
+const cors = require('cors');
 const app = express();
+
+// Configure CORS to allow requests from any origin
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 app.use((req, res, next) => {
   if (req.originalUrl.startsWith('/api/')) {

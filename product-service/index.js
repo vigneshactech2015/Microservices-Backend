@@ -1,5 +1,6 @@
 const express = require('express');
 const consul = require('consul')({ host: 'consul' });
+const cors = require('cors');
 const app = express();
 const ip = require('ip');
 const { v4: uuidv4 } = require('uuid');
@@ -7,6 +8,14 @@ const { v4: uuidv4 } = require('uuid');
 const serviceName = 'product-service';
 const serviceId = `product-service-${uuidv4()}`;
 const localIp = ip.address();
+
+// Configure CORS
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 app.use(express.json());
 
