@@ -41,7 +41,9 @@ function resolveService(serviceName) {
       } else {
         // adding load balancer to product service
         // round - robin load balancer
-        const service = serviceName === 'product-service' ? getNextInstance(serviceName,result) : result[0];
+
+        // const service = serviceName === 'product-service' ? getNextInstance(serviceName,result) : result[0];
+        const service = result[0];
         const address = service.ServiceAddress || service.Address;
         resolve(`http://${address}:${service.ServicePort}`);
       }
